@@ -25,6 +25,7 @@ def input_students
     puts "Add another name"
     puts "Which cohort?"
     puts "Add another hobby"
+    puts "To finish, just hit return three times"
     name = gets.chomp
     cohort = gets.chomp.to_sym
     hobby = gets.chomp
@@ -34,7 +35,7 @@ end
 
 
 
-def print(names)
+def print_students_list(names)
   puts "Which cohort do you want to see?"
 selected_cohort = gets.chomp    
   puts "The students of Villains Academy #{selected_cohort} cohort".center(120)
@@ -61,6 +62,7 @@ def print_menu
   puts "1. Input the students"
   puts "2. Show the students"
   puts "3. Save the list to students.csv"
+  puts "4. Load the list from students.csv"
   puts "9. Exit"
 end
 
@@ -81,6 +83,8 @@ def process(selection)
       show_students
     when "3"
       save_students
+    when "4"
+      load_students
     when "9"
       exit
     else
@@ -101,6 +105,15 @@ def save_students
     student_data = [student[:name], student[:cohort], student[:hobby]]
     csv_line = student_data.join(",")
     file.puts csv_line
+  end
+  file.close
+end
+
+def load_students
+  file = File.open("students.csv", "r")
+  file.readlines.each do |line|
+  name, cohort, hobby = line.chomp.split(',')
+    @students << {name: name, cohort: cohort.to_sym, hobby: hobby}
   end
   file.close
 end
