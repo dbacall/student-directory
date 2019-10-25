@@ -8,9 +8,9 @@ def input_students
   
   
   
-  name = gets.chomp
-  cohort = gets.chomp.to_sym
-  hobby = gets.chomp
+  name = STDIN.gets.chomp
+  cohort = STDIN.gets.chomp.to_sym
+  hobby = STDIN.gets.chomp
   while !name.empty? do
       if cohort.empty?
         @students << {name: name, cohort: :unknown, hobby: hobby}
@@ -26,9 +26,9 @@ def input_students
     puts "Which cohort?"
     puts "Add another hobby"
     puts "To finish, just hit return three times"
-    name = gets.chomp
-    cohort = gets.chomp.to_sym
-    hobby = gets.chomp
+    name = STDIN.gets.chomp
+    cohort = STDIN.gets.chomp.to_sym
+    hobby = STDIN.gets.chomp
   end
   @students
 end
@@ -37,7 +37,7 @@ end
 
 def print_students_list(names)
   puts "Which cohort do you want to see?"
-selected_cohort = gets.chomp    
+selected_cohort = STDIN.gets.chomp    
   puts "The students of Villains Academy #{selected_cohort} cohort".center(120)
   puts "-------------".center(120)
 
@@ -95,7 +95,7 @@ end
 def interactive_menu
   loop do
      print_menu
-     process(gets.chomp)
+     process(STDIN.gets.chomp)
   end
 end
 
@@ -109,8 +109,8 @@ def save_students
   file.close
 end
 
-def load_students
-  file = File.open("students.csv", "r")
+def load_students(filename = "students.csv")
+  file = File.open(filename, "r")
   file.readlines.each do |line|
   name, cohort, hobby = line.chomp.split(',')
     @students << {name: name, cohort: cohort.to_sym, hobby: hobby}
@@ -118,6 +118,19 @@ def load_students
   file.close
 end
 
+def try_load_students 
+  filename = ARGV.first
+  return if filename.nil?
+  if File.exists?(filename)
+    load_students(filename)
+      puts "Loaded #{@students.count} from #{filename}"
+  else 
+    puts "Sorry, #{filename} doesn't exist."
+    exit
+  end
+end
+
+try_load_students
 interactive_menu
 
 
