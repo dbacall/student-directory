@@ -1,34 +1,34 @@
 @students = []  
 
+def student_push(name, cohort, hobby) 
+  @students << {name: name, cohort: cohort, hobby: hobby}
+end
+
 def input_students
-  puts "Please enter the names of the students"
-  puts "Which cohort are you in?"
-  puts "Please enter their hobby"
-  puts "To finish, just hit return three times"
-  
-  
-  
-  name = STDIN.gets.chomp
-  cohort = STDIN.gets.chomp.to_sym
-  hobby = STDIN.gets.chomp
-  while !name.empty? do
-      if cohort.empty?
-        @students << {name: name, cohort: :unknown, hobby: hobby}
-      else
-        @students << {name: name, cohort: cohort, hobby: hobby}
-      end
-    if @students.length > 1
-    puts "Now we have #{@students.count} students"
-    else
-    puts "Now we have #{@students.count} student"   
-    end
-    puts "Add another name"
-    puts "Which cohort?"
-    puts "Add another hobby"
+
+  while true do
+    puts "Please enter the names of the students"
+    puts "Which cohort are you in?"
+    puts "Please enter their hobby"
     puts "To finish, just hit return three times"
     name = STDIN.gets.chomp
     cohort = STDIN.gets.chomp.to_sym
     hobby = STDIN.gets.chomp
+    
+    if name.empty?
+      break
+    elsif cohort.empty?
+      student_push(name, :unknown, hobby)
+    else
+      student_push(name, cohort, hobby)
+    end
+    
+    if @students.length > 1
+      puts "Now we have #{@students.count} students"
+    else
+      puts "Now we have #{@students.count} student"   
+    end
+    
   end
   @students
 end
@@ -40,8 +40,6 @@ def print_students_list(names)
 selected_cohort = STDIN.gets.chomp    
   puts "The students of Villains Academy #{selected_cohort} cohort".center(120)
   puts "-------------".center(120)
-
-
 
   names.each.with_index(1) do |student, i|
     if student[:cohort].to_s == selected_cohort
@@ -82,8 +80,10 @@ def process(selection)
     when "2"
       show_students
     when "3"
+      puts "Action succesful!"
       save_students
     when "4"
+      puts "Action succesful!"
       load_students
     when "9"
       exit
@@ -100,28 +100,30 @@ def interactive_menu
 end
 
 def save_students
-  file = File.open("students.csv", "w")
-  @students.each do |student|
-    student_data = [student[:name], student[:cohort], student[:hobby]]
-    csv_line = student_data.join(",")
-    file.puts csv_line
+  File.open("students.csv", "w") do |file|
+    @students.each do |student|
+      student_data = [student[:name], student[:cohort], student[:hobby]]
+      csv_line = student_data.join(",")
+      file.puts csv_line
+    end
   end
-  file.close
 end
 
 def load_students(filename = "students.csv")
-  file = File.open(filename, "r")
-  file.readlines.each do |line|
-  name, cohort, hobby = line.chomp.split(',')
-    @students << {name: name, cohort: cohort.to_sym, hobby: hobby}
+  File.open(filename, "r") do |file|
+    file.readlines.each do |line|
+      name, cohort, hobby = line.chomp.split(',')
+      student_push(name, cohort, hobby)
+    end
   end
-  file.close
 end
 
 def try_load_students 
   filename = ARGV.first
-  return if filename.nil?
-  if File.exists?(filename)
+  if filename.nil?
+    load_students()
+      puts "Loaded #{@students.count} from students.csv"
+  elsif File.exists?(filename)
     load_students(filename)
       puts "Loaded #{@students.count} from #{filename}"
   else 
